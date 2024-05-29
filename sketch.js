@@ -8,6 +8,11 @@ let circle2Ys = [540, 100, 280, 215];
 let circle3Xs = [175, 385, 370,  90];
 let circle3Ys = [175, 385, -15, 470];
 
+let song;
+let fft;
+let numBins = 128;
+let smoothing = 0.8;
+
 function minWindowSize(){
   return min(windowWidth,windowHeight);
 }
@@ -16,20 +21,31 @@ function randomColor(){
   return color(random(255),random(255),random(255));
 }
 
+function preload() {
+  song = loadSound('assets/Storyteller.flac');
+}
+
+
+
 function setup() {
   let Size = minWindowSize();
   createCanvas(Size, Size);
   
+  fft = new p5.FFT(smoothing, numBins);
+  song.connect(fft);
+
   background(0, 84, 121);
   
   noLoop();
 }
 
-function circleRing(centerX, centerY){
-  let radius = 35;
+
+
+function circleRing(centerX, centerY, freqEnergy){
+  let radius = map(freqEnergy, 0, 255, 20, 50);
   let numRects = 20; 
   let rectWidth = 5;
-  let rectHeight = 7;
+  let rectHeight = map(freqEnergy, 0, 255, 7, 14);
   let cornerRadius = 8;
   let layerNum = random(4,6);
   let s = 5/layerNum;
@@ -55,6 +71,18 @@ function circleRing(centerX, centerY){
   
 }
 
+
+function mousePressed() {
+  if (song.isPlaying()) {
+    song.pause();
+  } else {
+    song.loop();
+    loop();
+  }
+}
+
+
+
 function drawConcentricCircles(centerX, centerY, maxDiameter, numCircles) {
   let step = maxDiameter / numCircles;
   let e = random(1,255);
@@ -73,6 +101,7 @@ function drawConcentricCircles(centerX, centerY, maxDiameter, numCircles) {
     ellipse(centerX + offsetX, centerY + offsetY, diameter, diameter);
   }
 }
+
 //draw line and dots for circle1 & 2
 function drawCircleDots(centerX, centerY, radius, numDots, dot) {
   let angleStep = TWO_PI / numDots;
@@ -131,13 +160,23 @@ function Circle2(centerX, centerY){
   let initialNumDots = 40;  
   let dotsIncrement = 6;  
 
+
+    drawCircleDots(centerX, centerY, baseRadius + i * radiusIncrement, 30 + i * 7, 5);
+    drawCircleLines(centerX, centerY, 30 + numLayers * radiusIncrement, 200, 20);
+}
+
+
+function Circle2(centerX, centerY) {
+  let numLayers = 10;
+  let initialRadius = 30;
+  let radiusStep = 4;
+  let initialNumDots = 40;
+  let dotsIncrement = 6;
   fill(randomColor());
   noStroke();
   circle(centerX, centerY, 140);
-
   fill(randomColor());
   ellipse(centerX, centerY, 30, 30);  
-
   for (let i = 0; i < numLayers; i++) {
     let radius = initialRadius + i * radiusStep;  
     let numDots = initialNumDots + i * dotsIncrement;  
@@ -150,18 +189,14 @@ function Circle3(centerX, centerY){
   let innerRadius = 35;
   let outerRadius = 65;
   let numPoints = 120; 
-  
   let points = [];
-  
   for (let i = 0; i < numPoints; i++) {
     let angle = TWO_PI / numPoints * i;
     if (i % 2 == 0) {
-      
       let x = centerX + cos(angle) * innerRadius;
       let y = centerY + sin(angle) * innerRadius;
       points.push(createVector(x, y));
     } else {
-      
       let x = centerX + cos(angle) * outerRadius;
       let y = centerY + sin(angle) * outerRadius;
       points.push(createVector(x, y));
@@ -170,7 +205,6 @@ function Circle3(centerX, centerY){
   strokeWeight(1);
   stroke(randomColor());
   noFill();
-  
   beginShape();
   for (let p of points) {
     vertex(p.x, p.y);
@@ -185,7 +219,6 @@ function drawPinkCurve(centerX, centerY, radius) {
   let y1 = centerY + sin(angle) * radius;
   let cp1x = centerX + cos(angle + PI / 4) * radius / 2;
   let cp1y = centerY + sin(angle + PI / 4) * radius / 2;
-  
   stroke(255, 105, 180);
   strokeWeight(3);
   noFill();
@@ -209,22 +242,31 @@ function draw() {
   background(0, 84, 121);
   let Size = minWindowSize();
   scale(Size/500);
+  let spectrum = fft.analyze();
   for(let i = 0; i < centerXs.length; i++){
     let x = centerXs[i];
     let y = centerYs[i];
+    let freqEnergy = spectrum[i % spectrum.length];
+    let mappedSize = map(freqEnergy, 0, 255, 100, 140);
     fill(color(random(180,255),random(180,255),random(180,255)));
-    stroke(randomColor());
-    strokeWeight(random(1,4));
-    circle(x,y,140);
-  
-    drawChain(x, y, 80, 20); 
-    drawConcentricCircles(x, y, 60, 8);
 
+    stroke(randomColor());
+
+    strokeWeight(random(1,4));
+    circle(x,y,mappedSize);
+  
+    drawChain(x, y, map(freqEnergy, 0, 255, 50, 80), 20); 
+    drawConcentricCircles(x, y, map(freqEnergy, 0, 255, 40, 60), 8);
+    circleRing(x, y, freqEnergy);
  
     circleRing(x,y);
       
   if (random() < 0.2) {
     drawPinkCurve(x, y, 75);
+
+    strokeWeight(random(1, 4));
+    circle(x, y, mappedSize);
+
     }
   }
 

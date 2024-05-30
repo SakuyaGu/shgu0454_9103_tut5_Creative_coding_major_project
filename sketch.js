@@ -247,48 +247,47 @@ function draw() {
     let x = centerXs[i];
     let y = centerYs[i];
     let freqEnergy = spectrum[i % spectrum.length];
-    let mappedSize = map(freqEnergy, 0, 255, 100, 140);
-    fill(color(random(180,255),random(180,255),random(180,255)));
 
-    stroke(randomColor());
+    
+    fill(color(freqEnergy * random(180, 255) / 200, freqEnergy * random(180, 255) / 200, freqEnergy * random(180, 255) / 200));
+    stroke(randomColor() * freqEnergy);
 
-    strokeWeight(random(1,4));
-    circle(x,y,mappedSize);
+    strokeWeight(freqEnergy * random() / 8);
+    circle(x, y, map(freqEnergy, 0, 255, 100, 140));
   
     drawChain(x, y, map(freqEnergy, 0, 255, 50, 80), 20); 
-    drawConcentricCircles(x, y, map(freqEnergy, 0, 255, 40, 60), 8);
+    drawConcentricCircles(x, y, map(freqEnergy, 0, 255, 40, 60), 8, freqEnergy);
     circleRing(x, y, freqEnergy);
  
     circleRing(x,y);
       
-  if (random() < 0.2) {
-    drawPinkCurve(x, y, 75);
-
-    strokeWeight(random(1, 4));
-    circle(x, y, mappedSize);
+    if (freqEnergy) {
+      drawPinkCurve(x, y, 75);
 
     }
   }
 
   for(let i = 0; i < circle1Xs.length; i++){
+    let freqEnergy = spectrum[i % spectrum.length];
     let x = circle1Xs[i];
     let y = circle1Ys[i];
-    Circle1(x,y);
-    drawChain(x, y, 75, 15); 
-    
-  if (random() < 0.2) {
-    drawPinkCurve(x, y, 75);
+    Circle1(x, y, freqEnergy);
+    drawChain(x, y, map(freqEnergy, 0, 255, 50, 80), 15);
+
+    if (freqEnergy) {
+      drawPinkCurve(x, y, map(freqEnergy, 0, 255, 50, 80));
     }
   }
 
   for(let i = 0; i < circle2Xs.length; i++){
+    let freqEnergy = spectrum[i % spectrum.length];
     let x = circle2Xs[i];
     let y = circle2Ys[i];
-    Circle2(x,y);
-    drawChain(x, y, 75, 20); 
-    
-  if (random() < 0.2) {
-    drawPinkCurve(x, y, 75);
+    Circle2(x, y, freqEnergy);
+    drawChain(x, y, map(freqEnergy, 0, 255, 50, 80), 20);
+
+    if (freqEnergy) {
+      drawPinkCurve(x, y, 75);
     }
   }
 
@@ -307,10 +306,25 @@ function draw() {
     drawPinkCurve(x, y, 75);
     }
   }
+
+  for (let i = 0; i < circle3Xs.length; i++) {
+    let freqEnergy = spectrum[i % spectrum.length];
+    let x = circle3Xs[i];
+    let y = circle3Ys[i];
+    fill(freqEnergy * random() * 4, freqEnergy * random() * 5, freqEnergy * random() * 3);
+    circle(x, y, map(freqEnergy, 0, 255, 50, 80) * 2);
+    Circle3(x, y, freqEnergy);
+    fill(freqEnergy * random() * 4, freqEnergy * random() * 5, freqEnergy * random() * 3);
+    circle(x, y, map(freqEnergy, 0, 255, 50, 80));
+    drawConcentricCircles(x, y, map(freqEnergy, 0, 255, 50, 80), 5, freqEnergy);
+
+    if (freqEnergy) {
+      drawPinkCurve(x, y, map(freqEnergy, 0, 255, 50, 80));
+    }
+  }
 }
 
 function windowResized(){
   let Size = minWindowSize();
   resizeCanvas(Size, Size);
-
 }

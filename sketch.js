@@ -1,4 +1,4 @@
-//group of all center positions
+// Global variables for center coordinates, audio processing object, and spectrum analysis parameters
 let centerXs = [70,  490,  320, 430, 240,  -20 ];
 let centerYs = [70, 490,  130, 240,  430, 370];
 let circle1Xs = [210, 540,  130];
@@ -13,24 +13,25 @@ let fft;
 let numBins = 128;
 let smoothing = 0.8;
 
-
+// Calculate minimum window size to adapt to different screen sizes
 function minWindowSize(){
   return min(windowWidth,windowHeight);
 }
 
+// Preload the audio file
 function preload() {
   song = loadSound('assets/Storyteller.flac');
 }
 
 
-
+// Setup function to initialize the environment
 function setup() {
   let Size = minWindowSize();
   createCanvas(Size, Size);
   
   fft = new p5.FFT(smoothing, numBins);
   song.connect(fft);
-
+// Set color mode to HSB
   colorMode(HSB, 255);
 
   background(0, 84, 121);
@@ -38,7 +39,7 @@ function setup() {
   noLoop();
 }
 
-
+// Function to create a ring of circles
 function circleRing(centerX, centerY, freqEnergy){
   let radius = 35;
   let numRects = 20; 
@@ -85,7 +86,7 @@ function mousePressed() {
 }
 
 
-
+//Drawing Concentric Circles
 function drawConcentricCircles(centerX, centerY, maxDiameter, numCircles, freqEnergy) {
   let step = maxDiameter / numCircles;
   let e = freqEnergy * colorInt;
@@ -228,20 +229,30 @@ function drawChain(centerX, centerY, chainRadius, numLinks) {
   }
 }
 
+// Initialize variables to manage the color intensity adjustments.
 let colorInt = 0;
 let colorCount = 0;
-let flag=true;
+let flag=true;  // Flag to control the direction of counting (upward or downward).
+
+// Set an interval to update the colorInt value every 10 ms.
 window.setInterval(function() {  
   if(flag){
+     // If flag is true, increment colorCount to gradually increase the intensity.
     colorCount++;
+    // Normalize colorCount by dividing by 255 to get a range from 0 to 1 for colorInt.
     colorInt=colorCount/255;    
   } else {
+     // If flag is false, decrement colorCount to gradually decrease the intensity.
     colorCount--;
+    // Normalize colorCount to update colorInt accordingly.
     colorInt=colorCount/255;
   }
+    // Check if the upper or lower limits have been reached to reverse the direction.
   if(colorCount>=255){
+       // Once colorCount hits 255, change the flag to false to start decrementing.
     flag=false;
   } else if(colorCount<=0){
+        // Once colorCount drops to 0, change the flag to true to start incrementing.
     flag = true
   }
     

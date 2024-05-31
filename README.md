@@ -36,8 +36,8 @@ Originally, I wanted to implement the chain part to follow the rotation of the m
 ## Technical Implementation
 
 ### Audio Processing with FFT
-- **Fast Fourier Transform (FFT)**: The core of our audio analysis, the FFT function provided by p5.js, processes the audio signal to compute its frequency spectrum in real-time. This data drives the visual changes in the visualizer, linking visual dynamics directly to audio metrics like amplitude and frequency.
-- **Audio Connection**: We load and manage the audio within the p5.js environment using its `loadSound` function, ensuring that the visualizer has direct access to real-time audio data.
+- **Fast Fourier Transform**: The core of the audio analysis, the FFT function provided by p5.js, processes the audio signal to compute its frequency spectrum in real-time. This data drives the visual changes in the visualizer, linking visual dynamics directly to audio metrics like amplitude and frequency.
+- **Audio Connection**: I load and manage the audio within the p5.js environment using its `loadSound` function, ensuring that the visualizer has direct access to real-time audio data.
 
 ### Dynamic Visual Rendering
 - **Circle Visualization**: Circles expand and contract based on the frequency energy obtained from the FFT analysis. This size modulation is mapped from the amplitude data, providing a visual pulse that synchronizes with the beats of the music.
